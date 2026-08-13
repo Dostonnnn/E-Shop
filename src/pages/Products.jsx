@@ -23,7 +23,6 @@ const Products = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-
     axios
       .get(api, {
         headers: {
