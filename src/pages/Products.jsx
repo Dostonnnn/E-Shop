@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
 const Products = () => {
   const api = "https://backend.magnateshop.uz/api/products";
 
@@ -22,7 +21,6 @@ const Products = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-
     axios
       .get(api, {
         headers: {
@@ -68,7 +66,6 @@ const Products = () => {
 
   const addProduct = () => {
     const token = localStorage.getItem("token");
-
     const data = {
       name: name,
       description: description,
@@ -152,7 +149,7 @@ const Products = () => {
 
     axios
       .patch(
-        `${api}/${item.id}`,
+        `${api}/${item.id}/status`,
         {
           isActive: status,
         },
