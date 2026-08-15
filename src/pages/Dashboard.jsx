@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Navigate } from "react-router-dom";
 
 function Dashboard() {
   const [stats, setStats] = useState(null);
   const [categoryStats, setCategoryStats] = useState([]);
   const [lowStock, setLowStock] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const getHeaders = () => {
     const token = localStorage.getItem("token");
@@ -58,7 +56,6 @@ function Dashboard() {
   useEffect(() => {
     const loadAllDashboardData = async () => {
       setLoading(true);
-      setError(null);
       await fetchGeneralStats();
       await fetchCategoryStats();
       await fetchLowStock();
@@ -73,23 +70,6 @@ function Dashboard() {
         <p className="text-xs uppercase tracking-widest font-mono text-cyan-400 animate-pulse">
           Yuklanmoqda
         </p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="p-4 bg-rose-950/30 border border-rose-800/50 text-rose-400 rounded-xl text-xs font-semibold flex items-center justify-between">
-        <span>{error}</span>
-        <button
-          onClick={() => {
-            localStorage.clear();
-            Navigate("/login");
-          }}
-          className="ml-4 px-3 py-1.5 bg-rose-600 text-white rounded text-xs font-bold uppercase tracking-wider hover:bg-rose-500 transition cursor-pointer"
-        >
-          Login sahifasiga o'tish
-        </button>
       </div>
     );
   }
@@ -112,7 +92,7 @@ function Dashboard() {
             Jami mahsulotlar
           </p>
           <p className="text-2xl font-black font-mono text-cyan-300 mt-2">
-            {stats?.products?.total ?? stats?.totalProducts ?? 0}
+            {stats.products.total}
           </p>
         </div>
 
@@ -121,7 +101,7 @@ function Dashboard() {
             Kam qolganlar
           </p>
           <p className="text-2xl font-black font-mono text-amber-400 mt-2">
-            {stats?.products?.lowStock ?? stats?.lowStockProducts ?? 0}
+            {stats.products.lowStock}
           </p>
         </div>
 
@@ -130,7 +110,7 @@ function Dashboard() {
             Tugaganlar
           </p>
           <p className="text-2xl font-black font-mono text-rose-400 mt-2">
-            {stats?.products?.outOfStock ?? stats?.outOfStockProducts ?? 0}
+            {stats.products.outOfStock}
           </p>
         </div>
 
@@ -139,12 +119,11 @@ function Dashboard() {
             Kategoriyalar
           </p>
           <p className="text-2xl font-black font-mono text-violet-400 mt-2">
-            {stats?.categories?.total ?? stats?.totalCategories ?? 0}
+            {stats.categories.total}
           </p>
         </div>
       </div>
 
-      {/* 2. Category Stats Section */}
       <div className="bg-[#111827]/80 border border-zinc-800 rounded-xl p-5 shadow-lg backdrop-blur-md">
         <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-violet-400"></span>
@@ -157,17 +136,17 @@ function Dashboard() {
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {categoryStats.map((cat, idx) => (
+            {categoryStats.map((cat) => (
               <div
-                key={cat.id || cat._id || idx}
+                key={cat.id}
                 className="bg-[#0B0F17] border border-zinc-800 p-3.5 rounded-lg flex justify-between items-center"
               >
                 <div>
                   <p className="text-xs font-semibold text-zinc-200">
-                    {cat.name || cat.categoryName || "Noma'lum"}
+                    {cat.name}
                   </p>
                   <p className="text-[10px] text-zinc-500 mt-0.5 font-mono">
-                    {cat.count ?? cat.productsCount ?? 0} ta mahsulot
+                    {cat.productsCount} ta mahsulot
                   </p>
                 </div>
                 <span className="w-2 h-2 rounded-full bg-cyan-400/80"></span>
@@ -210,30 +189,30 @@ function Dashboard() {
               ) : (
                 lowStock.map((item) => (
                   <tr
-                    key={item.id || item._id}
+                    key={item.id}
                     className="hover:bg-cyan-950/20 transition-colors duration-150"
                   >
                     <td className="p-3.5">
                       <img
-                        src={item.imageUrl || item.image}
-                        alt={item.title || item.name}
+                        src={item.image}
+                        alt={item.name}
                         className="w-9 h-9 object-cover rounded-md border border-zinc-700 bg-zinc-900"
                       />
                     </td>
                     <td className="p-3.5 font-semibold text-zinc-200">
-                      {item.title || item.name}
+                      {item.name}
                     </td>
                     <td className="p-3.5 text-zinc-400">
-                      {item.category?.name || item.category || "—"}
+                      {item.category.name}
                     </td>
                     <td className="p-3.5 font-mono font-bold text-cyan-300">
-                      ${item.price?.toLocaleString()}
+                      ${item.price} so'm
                     </td>
                     <td className="p-3.5 font-mono font-bold text-zinc-200">
-                      {item.stock ?? item.quantity ?? 0} ta
+                      {item.stock} ta
                     </td>
                     <td className="p-3.5">
-                      {(item.stock ?? item.quantity) === 0 ? (
+                      {item.stock === 0 ? (
                         <span className="px-2.5 py-1 rounded bg-rose-500/10 border border-rose-500/30 text-[10px] font-bold uppercase tracking-wider text-rose-400">
                           Tugagan
                         </span>

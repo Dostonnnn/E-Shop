@@ -9,20 +9,20 @@ const Products = () => {
   const [products, setProducts] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
-
   const [edit, setEdit] = useState(null);
   const [del, setDel] = useState(null);
   const [add, setAdd] = useState(false);
-
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [image, setImage] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [data, setData] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     axios
       .get(api, {
         headers: {
@@ -34,8 +34,10 @@ const Products = () => {
         },
       })
       .then((res) => {
+        setData(res.data.data.items);
         setProducts(res.data.data.items);
         setTotalPage(res.data.data.meta.totalPages);
+        console.log(data);
       })
       .catch(() => {
         toast.error("Failed");
@@ -143,9 +145,11 @@ const Products = () => {
 
   const changeStatus = (item, status) => {
     const token = localStorage.getItem("token");
+
     if (token) {
       console.log("token bor");
     }
+
     axios
       .patch(
         `${api}/${item.id}`,
@@ -217,17 +221,11 @@ const Products = () => {
               <thead className="bg-[#161F30]/60 border-b border-zinc-800">
                 <tr className="text-zinc-400 text-[11px] uppercase tracking-wider font-bold">
                   <th className="w-[5%] px-3 py-4">ID</th>
-
                   <th className="w-[19%] px-3 py-4">Product</th>
-
                   <th className="w-[25%] px-3 py-4">Description</th>
-
                   <th className="w-[14%] px-3 py-4">Price</th>
-
                   <th className="w-[12%] px-3 py-4">Status</th>
-
                   <th className="w-[12%] px-3 py-4">Edit</th>
-
                   <th className="w-[13%] px-3 py-4">Delete</th>
                 </tr>
               </thead>
