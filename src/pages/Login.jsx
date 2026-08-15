@@ -36,7 +36,7 @@ const Login = () => {
         const accessToken = response.data.accessToken;
 
         if (accessToken) {
-          localStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("token", accessToken);
 
           const message = response.message;
           toast.success(message);
@@ -56,24 +56,26 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F6F8] flex items-center justify-center px-5">
+    <div className="min-h-screen bg-[#0B0F17] flex items-center justify-center px-5 text-zinc-100 font-sans">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#0F172A] mb-4">
-            <span className="text-white text-xl font-bold">M</span>
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-zinc-900 border border-zinc-800 text-cyan-400 font-mono font-black text-xl mb-4 shadow-lg shadow-cyan-500/10">
+            M
           </div>
 
-          <h1 className="text-2xl font-bold text-[#0F172A]">Welcome back</h1>
+          <h1 className="text-2xl font-black text-white uppercase tracking-wider">
+            Welcome back
+          </h1>
 
-          <p className="text-sm text-gray-500 mt-2">
+          <p className="text-xs text-zinc-500 mt-2">
             Sign in to your admin panel
           </p>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-2xl p-7 shadow-[0_8px_30px_rgb(15,23,42,0.06)]">
+        <div className="bg-[#111827]/80 border border-zinc-800 rounded-xl p-7 shadow-2xl backdrop-blur-md">
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             <div>
-              <label className="block text-sm font-medium text-[#0F172A] mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
                 Username
               </label>
 
@@ -82,12 +84,12 @@ const Login = () => {
                 placeholder="Enter your username"
                 value={username}
                 onChange={handleUsername}
-                className="w-full h-12 px-4 bg-[#F8FAFC] border border-gray-200 rounded-xl outline-none text-[#0F172A] placeholder:text-gray-400 focus:border-[#0F172A] focus:bg-white transition duration-200"
+                className="w-full h-11 px-4 bg-[#0B0F17] border border-zinc-800 rounded-lg outline-none text-xs text-zinc-200 placeholder:text-zinc-500 focus:border-cyan-500 transition duration-200"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#0F172A] mb-2">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2">
                 Password
               </label>
 
@@ -96,26 +98,26 @@ const Login = () => {
                 placeholder="Enter your password"
                 value={password}
                 onChange={handlePassword}
-                className="w-full h-12 px-4 bg-[#F8FAFC] border border-gray-200 rounded-xl outline-none text-[#0F172A] placeholder:text-gray-400 focus:border-[#0F172A] focus:bg-white transition duration-200"
+                className="w-full h-11 px-4 bg-[#0B0F17] border border-zinc-800 rounded-lg outline-none text-xs text-zinc-200 placeholder:text-zinc-500 focus:border-cyan-500 transition duration-200"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-[#0F172A] hover:bg-[#1E293B] text-white rounded-xl font-medium transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-1"
+              className="w-full h-11 bg-cyan-500 hover:bg-cyan-400 text-slate-950 rounded-lg text-xs font-bold uppercase tracking-wider transition duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-1 shadow-lg shadow-cyan-500/20"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-xs text-gray-400 mt-6">
+        <p className="text-center text-xs font-mono text-zinc-600 mt-6">
           Admin Dashboard
         </p>
       </div>
 
-      <ToastContainer autoClose={2000} />
+      <ToastContainer autoClose={2000} theme="dark" />
     </div>
   );
 };
