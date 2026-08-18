@@ -132,7 +132,6 @@ const Categories = () => {
 
   const changeStatus = (item, status) => {
     const token = localStorage.getItem("token");
-
     axios
       .patch(
         `${api}/${item.id}/status`,

@@ -37,7 +37,7 @@ const Products = () => {
         },
       })
       .then((res) => {
-        const items = res.data.data.items || [];
+        const items = res.data.data.items;
         setData(items);
         setProducts(items);
         setTotalPage(res.data.data.meta.totalPages);
@@ -51,7 +51,6 @@ const Products = () => {
   };
 
   useEffect(() => {
-    getProducts();
     const token = localStorage.getItem("token");
 
     axios
@@ -61,7 +60,8 @@ const Products = () => {
         },
       })
       .then((res) => {
-        setCategories(res.data.data.items || res.data.data || []);
+        getProducts();
+        setCategories(res.data.data.items);
       })
       .catch(() => {});
   }, [page]);

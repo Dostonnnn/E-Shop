@@ -1,69 +1,59 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
-function Dashboard() {
+const Dashboard = () => {
+  const statsApi = "https://backend.magnateshop.uz/api/dashboard/stats";
+  const catStatsApi =
+    "https://backend.magnateshop.uz/api/dashboard/category-stats";
+  const lowStockApi =
+    "https://backend.magnateshop.uz/api/dashboard/low-stock?threshold=3";
+
+  const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
   const [categoryStats, setCategoryStats] = useState([]);
   const [lowStock, setLowStock] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const limit = 5;
 
-  const getHeaders = () => {
-    const token = localStorage.getItem("token");
-    return { Authorization: `Bearer ${token}` };
-  };
-
-  const fetchGeneralStats = async () => {
-    try {
-      const headers = getHeaders();
-      const res = await axios.get(
-        "https://backend.magnateshop.uz/api/dashboard/stats",
-        { headers },
-      );
-      setStats(res.data.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const fetchCategoryStats = async () => {
-    try {
-      const headers = getHeaders();
-      const res = await axios.get(
-        "https://backend.magnateshop.uz/api/dashboard/category-stats",
-        { headers },
-      );
-      const rawCatData = res.data.data;
-      setCategoryStats(Array.isArray(rawCatData) ? rawCatData : []);
-    } catch (err) {
-      console.error("Category Stats Fetch Error:", err);
-    }
-  };
-
-  const fetchLowStock = async () => {
-    try {
-      const headers = getHeaders();
-      const res = await axios.get(
-        "https://backend.magnateshop.uz/api/dashboard/low-stock?threshold=3",
-        { headers },
-      );
-      const rawLowStockData = res.data.data;
-      setLowStock(Array.isArray(rawLowStockData) ? rawLowStockData : []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   useEffect(() => {
-    const loadAllDashboardData = async () => {
-      setLoading(true);
-      await fetchGeneralStats();
-      await fetchCategoryStats();
-      await fetchLowStock();
-      setLoading(false);
-    };
-    loadAllDashboardData();
+    const token = localStorage.getItem("token");
+    const headers = { Authorization: `Bearer ${token}` };
+
+    setLoading(true);
+
+    // General Stats API
+    axios
+      .get(statsApi, { headers })
+      .then((res) => {
+        setStats(res.data.data);
+      })
+      .catch(() => {
+        toast.error("Stats failed to load");
+      });
+
+    // Category Stats API
+    axios
+      .get(catStatsApi, { headers })
+      .then((res) => {
+        setCategoryStats(res.data.data || []);
+      })
+      .catch(() => {
+        toast.error("Category stats failed to load");
+      });
+
+    // Low Stock API
+    axios
+      .get(lowStockApi, { headers })
+      .then((res) => {
+        setLowStock(res.data.data || []);
+      })
+      .catch(() => {
+        toast.error("Low stock items failed to load");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const totalPages = Math.ceil(lowStock.length / limit) || 1;
@@ -79,9 +69,9 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <div className="h-80 flex items-center justify-center bg-[#0B0F17]">
+      <div className="h-96 flex items-center justify-center bg-[#0B0F17]">
         <p className="text-xs uppercase tracking-widest font-mono text-cyan-400 animate-pulse">
-          Yuklanmoqda
+          Loading...
         </p>
       </div>
     );
@@ -105,7 +95,7 @@ function Dashboard() {
             Jami mahsulotlar
           </p>
           <p className="text-2xl font-black font-mono text-cyan-300 mt-2">
-            {stats.products.total}
+            {stats?.products?.total || 0}
           </p>
         </div>
 
@@ -114,7 +104,7 @@ function Dashboard() {
             Kam qolganlar
           </p>
           <p className="text-2xl font-black font-mono text-amber-400 mt-2">
-            {stats.products.lowStock}
+            {stats?.products?.lowStock || 0}
           </p>
         </div>
 
@@ -123,7 +113,7 @@ function Dashboard() {
             Tugaganlar
           </p>
           <p className="text-2xl font-black font-mono text-rose-400 mt-2">
-            {stats.products.outOfStock}
+            {stats?.products?.outOfStock || 0}
           </p>
         </div>
 
@@ -132,7 +122,7 @@ function Dashboard() {
             Kategoriyalar
           </p>
           <p className="text-2xl font-black font-mono text-violet-400 mt-2">
-            {stats.categories.total}
+            {stats?.categories?.total || 0}
           </p>
         </div>
       </div>
@@ -159,7 +149,7 @@ function Dashboard() {
                     {cat.name}
                   </p>
                   <p className="text-[10px] text-zinc-500 mt-0.5 font-mono">
-                    {cat.productsCount} ta mahsulot
+                    {cat.productsCount} ta
                   </p>
                 </div>
                 <span className="w-2 h-2 rounded-full bg-cyan-400/80"></span>
@@ -216,10 +206,10 @@ function Dashboard() {
                       {item.name}
                     </td>
                     <td className="p-3.5 text-zinc-400">
-                      {item.category.name}
+                      {item.category?.name}
                     </td>
                     <td className="p-3.5 font-mono font-bold text-cyan-300">
-                      ${item.price} so'm
+                      {item.price} UZS
                     </td>
                     <td className="p-3.5 font-mono font-bold text-zinc-200">
                       {item.stock} ta
@@ -266,6 +256,6 @@ function Dashboard() {
       </div>
     </div>
   );
-}
+};
 
 export default Dashboard;
