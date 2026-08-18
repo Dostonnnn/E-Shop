@@ -6,6 +6,8 @@ function Dashboard() {
   const [categoryStats, setCategoryStats] = useState([]);
   const [lowStock, setLowStock] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const getHeaders = () => {
     const token = localStorage.getItem("token");
@@ -63,6 +65,17 @@ function Dashboard() {
     };
     loadAllDashboardData();
   }, []);
+
+  const totalPages = Math.ceil(lowStock.length / limit) || 1;
+  const paginatedLowStock = lowStock.slice((page - 1) * limit, page * limit);
+
+  const next = () => {
+    if (page < totalPages) setPage(page + 1);
+  };
+
+  const prev = () => {
+    if (page > 1) setPage(page - 1);
+  };
 
   if (loading) {
     return (
@@ -177,7 +190,7 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/60 text-xs">
-              {lowStock.length === 0 ? (
+              {paginatedLowStock.length === 0 ? (
                 <tr>
                   <td
                     colSpan="6"
@@ -187,7 +200,7 @@ function Dashboard() {
                   </td>
                 </tr>
               ) : (
-                lowStock.map((item) => (
+                paginatedLowStock.map((item) => (
                   <tr
                     key={item.id}
                     className="hover:bg-cyan-950/20 transition-colors duration-150"
@@ -227,6 +240,28 @@ function Dashboard() {
               )}
             </tbody>
           </table>
+        </div>
+
+        <div className="px-5 py-4 border-t border-zinc-800 bg-[#161F30]/30 flex items-center justify-between">
+          <button
+            onClick={prev}
+            disabled={page === 1}
+            className="px-4 py-2 border border-zinc-700 bg-zinc-900/50 rounded-lg text-xs font-semibold text-zinc-300 hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-zinc-900/50 transition cursor-pointer"
+          >
+            Previous
+          </button>
+
+          <p className="text-xs text-zinc-400 font-mono">
+            Page {page} of {totalPages}
+          </p>
+
+          <button
+            onClick={next}
+            disabled={page === totalPages}
+            className="px-4 py-2 border border-zinc-700 bg-zinc-900/50 rounded-lg text-xs font-semibold text-zinc-300 hover:bg-zinc-800 disabled:opacity-30 disabled:hover:bg-zinc-900/50 transition cursor-pointer"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>
