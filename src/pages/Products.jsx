@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+
 const Products = () => {
   const api = "https://backend.magnateshop.uz/api/products";
+  const catApi = "https://backend.magnateshop.uz/api/categories";
 
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(1);
   const [edit, setEdit] = useState(null);
@@ -19,8 +22,10 @@ const Products = () => {
   const [categoryId, setCategoryId] = useState("");
   const [data, setData] = useState([]);
 
-  useEffect(() => {
+  const getProducts = () => {
+    setLoading(true);
     const token = localStorage.getItem("token");
+
     axios
       .get(api, {
         headers: {
@@ -32,10 +37,10 @@ const Products = () => {
         },
       })
       .then((res) => {
-        setData(res.data.data.items);
-        setProducts(res.data.data.items);
+        const items = res.data.data.items || [];
+        setData(items);
+        setProducts(items);
         setTotalPage(res.data.data.meta.totalPages);
-        console.log(data);
       })
       .catch(() => {
         toast.error("Failed");
@@ -43,6 +48,22 @@ const Products = () => {
       .finally(() => {
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    getProducts();
+    const token = localStorage.getItem("token");
+
+    axios
+      .get(catApi, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setCategories(res.data.data.items || res.data.data || []);
+      })
+      .catch(() => {});
   }, [page]);
 
   const openEdit = (item) => {
@@ -85,7 +106,7 @@ const Products = () => {
         toast.success("Added");
         setAdd(false);
         clearForm();
-        setPage(1);
+        getProducts();
       })
       .catch(() => {
         toast.error("Failed");
@@ -114,7 +135,7 @@ const Products = () => {
         toast.success("Updated");
         setEdit(null);
         clearForm();
-        setPage(page);
+        getProducts();
       })
       .catch(() => {
         toast.error("Failed");
@@ -133,7 +154,7 @@ const Products = () => {
       .then(() => {
         toast.success("Deleted");
         setDel(null);
-        setPage(page);
+        getProducts();
       })
       .catch(() => {
         toast.error("Failed");
@@ -142,10 +163,6 @@ const Products = () => {
 
   const changeStatus = (item, status) => {
     const token = localStorage.getItem("token");
-
-    if (token) {
-      console.log("token bor");
-    }
 
     axios
       .patch(
@@ -161,7 +178,7 @@ const Products = () => {
       )
       .then(() => {
         toast.success(status ? "Activated" : "Deactivated");
-        setPage(page);
+        getProducts();
       })
       .catch(() => {
         toast.error("Failed");
@@ -365,13 +382,18 @@ const Products = () => {
                 className="bg-[#0B0F17] border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 rounded-lg px-3 py-2 outline-none focus:border-cyan-500 transition"
               />
 
-              <input
+              <select
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                type="number"
-                placeholder="Category ID"
-                className="bg-[#0B0F17] border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 rounded-lg px-3 py-2 outline-none focus:border-cyan-500 transition"
-              />
+                className="bg-[#0B0F17] border border-zinc-800 text-xs text-zinc-200 rounded-lg px-3 py-2 outline-none focus:border-cyan-500 transition cursor-pointer"
+              >
+                <option value="">Select Category</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
 
               <input
                 value={image}
